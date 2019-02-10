@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <map>
 
 void printText(std::vector<char>& raw, std::vector<char>& encrypted);
 void replaceSingleChar(std::vector<char>& input, char current, char target);
@@ -11,17 +12,24 @@ int main(){
     std::cout << "Hello world, cryptoApp!\n";
 
     std::string inputText = "Stoi na stacji lokomotywa";
+    
+    std::map<char, char> privateKey{
+        {'a', 'b'},
+        {'o', 'k'},
+        {'f', 'q'}
+    };
+    
     std::vector<char> rawText(inputText.begin(), inputText.end());
     std::vector<char> encryptedText(inputText.begin(), inputText.end()); 
 
     printText(rawText, encryptedText);
-    replaceSingleChar(encryptedText, 'a', 'b');
+    replaceSingleChar(encryptedText, 'a', privateKey['a']);
     printText(rawText, encryptedText);
       
-    replaceSingleChar(encryptedText, 'o', 'k');
+    replaceSingleChar(encryptedText, 'o', privateKey['o']);
     printText(rawText, encryptedText);
      
-    replaceSingleChar(encryptedText, 'f', 'q');
+    replaceSingleChar(encryptedText, 'f', privateKey['f']);
     printText(rawText, encryptedText);
  
     return 0;
