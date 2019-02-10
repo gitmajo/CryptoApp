@@ -1,14 +1,17 @@
 #include <iostream>
 #include <string>
-#include <algorithm>
+#include <algorithm> 
 #include <iterator>
 #include <vector>
 #include <map>
+#include <numeric> //iota
+#include <random>
 
 void printText(std::vector<char>& raw, std::vector<char>& encrypted);
 void replaceSingleChar(std::vector<char>& input, char current, char target);
-void printSecretMap(const std::map<char, char>& secretMap);
+void printMap(const std::map<char, char>& secretMap);
 void encryptText(std::vector<char>& encryptedText, const std::map<char, char>& secretMap);
+std::map<char, char> generateSecretMap();
 
 int main(){
     std::cout << "Hello world, cryptoApp!\n";
@@ -22,14 +25,21 @@ int main(){
     };
     
     std::vector<char> rawText(inputText.begin(), inputText.end());
-    std::vector<char> encryptedText(inputText.begin(), inputText.end()); 
-    
-    printSecretMap(secretMap);
+    std::vector<char> encryptedText(inputText.begin(), inputText.end());  
+    std::vector<char> encryptedTextX(inputText.begin(), inputText.end()); 
+
+    printMap(secretMap);
 
     printText(rawText, encryptedText);
     
     encryptText(encryptedText, secretMap);
     printText(rawText, encryptedText);
+ 
+    auto privateMap = generateSecretMap();
+    printMap(privateMap);
+    
+    encryptText(encryptedTextX, privateMap);
+    printText(rawText, encryptedTextX);
  
 
     return 0;
@@ -49,7 +59,7 @@ void replaceSingleChar(std::vector<char>& input, char current, char target){
 }
 
 
-void printSecretMap(const std::map<char, char>& secretMap){
+void printMap(const std::map<char, char>& secretMap){
     std::for_each(secretMap.begin(), secretMap.end(), [](const auto& p){
                 std::cout << p.first << ":" << p.second << "\n"; 
             });
@@ -61,4 +71,16 @@ void encryptText(std::vector<char>& encText, const std::map<char, char>& sMap){
                 });
 }
 
-
+std::map<char, char> generateSecretMap(){
+    std::vector<int> keys(95);
+    std::iota(keys.begin(), keys.end(), 32); //start from Space character 
+    std::vector<int> values = keys;
+    
+    std::shuffle(values.begin(), values.end(), std::mt19937{std::random_device{}()});
+    
+    std::map<char, char> tempMap;    
+    for(unsigned i=0; i<keys.size(); ++i)
+        tempMap[keys[i]] = values[i];
+    
+    return tempMap;
+}
