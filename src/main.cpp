@@ -6,10 +6,14 @@
 #include <map>
 #include <numeric> //iota
 #include <random>
+#include <fstream>
+
+std::ostream& operator<<(std::ostream& os, const std::pair<char, char>& pair);
 
 void printText(const std::vector<char>& raw, const std::vector<char>& encrypted);
-void replaceSingleChar(std::vector<char>& input, char current, char target);
 void printMap(const std::map<char, char>& secretMap);
+bool saveSecretMap(const std::map<char, char>& map, const std::string filename="../secretMap");
+
 std::vector<char> encrypt(const std::vector<char>& plain, const std::map<char,char>& secretMap);
 std::vector<char> decrypt(const std::vector<char>& encrypted, const std::map<char,char>& secretMap);
 std::map<char, char> generateSecretMap();
@@ -21,14 +25,15 @@ int main(){
     const std::string inputText = "Stoi na stacji lokomotywa";
     const std::vector<char> rawText(inputText.begin(), inputText.end());
 
-    auto privateMap = generateSecretMap();
+    auto secretMap = generateSecretMap();
 
-    std::vector<char> encrypted = encrypt(rawText, privateMap);
+    std::vector<char> encrypted = encrypt(rawText, secretMap);
     printText(rawText, encrypted);
  
-    std::vector<char> decrypted = decrypt(encrypted, privateMap);
+    std::vector<char> decrypted = decrypt(encrypted, secretMap);
     printText(encrypted, decrypted); 
 
+    saveSecretMap(secretMap);
 
     return 0;
 }
@@ -44,9 +49,20 @@ void printText(const std::vector<char>& raw, const std::vector<char>& encrypted)
 
 
 void printMap(const std::map<char,char>& secretMap){
-    std::for_each(secretMap.begin(), secretMap.end(), [](const auto& p){
-                std::cout << p.first << ":" << p.second << "\n"; 
+    std::for_each(secretMap.begin(), secretMap.end(), [](const auto& pair){
+                std::cout << pair << "\n";
             });
+}
+
+bool saveSecretMap(const std::map<char, char>& map, const std::string filename/*="secretMap"*/){
+    std::ofstream ofs {filename};
+    if(!ofs){
+        std::cout << "Could not open " << filename << " for writing!\n";
+        return false;
+    }
+    for(const auto& pair : map)
+        ofs << pair;
+    return true;
 }
 
 std::vector<char> encrypt(const std::vector<char>& plain, const std::map<char,char>& sMap){
@@ -85,4 +101,9 @@ std::map<char, char> reverseMap(const std::map<char,char>& original){
     for(auto& p : original)
         reversed[(p.second)] = (p.first);
     return reversed;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::pair<char,char>& pair){
+    os << pair.first << ":" << pair.second << "\n";
+    return os;
 }
